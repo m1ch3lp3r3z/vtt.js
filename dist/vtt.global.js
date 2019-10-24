@@ -83,7 +83,10 @@ function roundFloat(n, p) {
     return n;
   }
 
-  p = p || 2;
+  if (!p) {
+    return Math.round(n);
+  }
+
   d = Math.pow(10, p);
 
   return Math.round(n * d) / d;
@@ -1035,7 +1038,13 @@ WebVTT.processCues = function(window, cues, overlay) {
   (function() {
     var styleBox, cue;
 
-    for (var i = 0; i < cues.length; i++) {
+    // Add cues in reverse to ensure shifted positions from container
+    // bottom overlapping will be aplied to all displaying cues
+    // when container is resized and bottom line doesn't fit anymore
+    // its moved above lines already positioned that
+    // should be displayed first, so line order is broken
+    // TODO: check different cases for cues positions
+    for (var i = cues.length - 1; i >= 0; i--) {
       cue = cues[i];
 
       // Compute the intial position and styles of the cue div.
