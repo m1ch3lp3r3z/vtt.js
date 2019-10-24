@@ -78,14 +78,15 @@ function parseTimeStamp(input) {
 }
 
 // Reduce decimals to given `p` precision in a float number
-function fixFloat(n, p) {
+function roundFloat(n, p) {
   if (typeof n != "number") {
     return n;
   }
 
   p = p || 2;
+  d = Math.pow(10, p);
 
-  return parseFloat(n.toFixed(p));
+  return Math.round(n * d) / d;
 }
 
 // A settings object holds key/value pairs and will ignore anything but the first
@@ -701,12 +702,12 @@ function BoxPosition(obj) {
                : 0;
 
   }
-  this.left = fixFloat(obj.left);
-  this.right = fixFloat(obj.right);
-  this.top = fixFloat(obj.top || top);
-  this.height = fixFloat(obj.height || height);
-  this.bottom = fixFloat(obj.bottom || (top + (obj.height || height)));
-  this.width = fixFloat(obj.width || width);
+  this.left = roundFloat(obj.left);
+  this.right = roundFloat(obj.right);
+  this.top = roundFloat(obj.top || top);
+  this.height = roundFloat(obj.height || height);
+  this.bottom = roundFloat(obj.bottom || (top + (obj.height || height)));
+  this.width = roundFloat(obj.width || width);
   this.lineHeight = lh !== undefined ? lh : obj.lineHeight;
 }
 
@@ -717,30 +718,30 @@ BoxPosition.prototype.move = function(axis, toMove) {
   toMove = toMove !== undefined ? toMove : this.lineHeight;
   switch (axis) {
   case "+x":
-    this.left = fixFloat(this.left + toMove);
-    this.right = fixFloat(this.right + toMove);
+    this.left = roundFloat(this.left + toMove);
+    this.right = roundFloat(this.right + toMove);
     break;
   case "-x":
-    this.left = fixFloat(this.left - toMove);
-    this.right = fixFloat(this.right - toMove);
+    this.left = roundFloat(this.left - toMove);
+    this.right = roundFloat(this.right - toMove);
     break;
   case "+y":
-    this.top = fixFloat(this.top + toMove);
-    this.bottom = fixFloat(this.bottom + toMove);
+    this.top = roundFloat(this.top + toMove);
+    this.bottom = roundFloat(this.bottom + toMove);
     break;
   case "-y":
-    this.top = fixFloat(this.top - toMove);
-    this.bottom = fixFloat(this.bottom - toMove);
+    this.top = roundFloat(this.top - toMove);
+    this.bottom = roundFloat(this.bottom - toMove);
     break;
   }
 };
 
 // Check if this box overlaps another box, b2.
 BoxPosition.prototype.overlaps = function(b2) {
-  return this.left < fixFloat(b2.right) &&
-         this.right > fixFloat(b2.left) &&
-         this.top < fixFloat(b2.bottom) &&
-         this.bottom > fixFloat(b2.top);
+  return this.left < roundFloat(b2.right) &&
+         this.right > roundFloat(b2.left) &&
+         this.top < roundFloat(b2.bottom) &&
+         this.bottom > roundFloat(b2.top);
 };
 
 // Check if this box overlaps any other boxes in boxes.
@@ -812,12 +813,12 @@ BoxPosition.getSimpleBoxPosition = function(obj) {
   obj = obj.div ? obj.div.getBoundingClientRect() :
                 obj.tagName ? obj.getBoundingClientRect() : obj;
   var ret = {
-    left: fixFloat(obj.left),
-    right: fixFloat(obj.right),
-    top: fixFloat(obj.top || top),
-    height: fixFloat(obj.height || height),
-    bottom: fixFloat(obj.bottom || (top + (obj.height || height))),
-    width: fixFloat(obj.width || width)
+    left: roundFloat(obj.left),
+    right: roundFloat(obj.right),
+    top: roundFloat(obj.top || top),
+    height: roundFloat(obj.height || height),
+    bottom: roundFloat(obj.bottom || (top + (obj.height || height))),
+    width: roundFloat(obj.width || width)
   };
   return ret;
 };
